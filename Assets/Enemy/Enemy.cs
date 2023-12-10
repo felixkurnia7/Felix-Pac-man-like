@@ -13,6 +13,8 @@ public class Enemy : MonoBehaviour
     public ChaseState ChaseState = new ChaseState();
     [HideInInspector]
     public RetreatState RetreatState = new RetreatState();
+    [HideInInspector]
+    public Animator Animator;
 
     [SerializeField]
     public List<Transform> Waypoints = new List<Transform>();
@@ -28,6 +30,7 @@ public class Enemy : MonoBehaviour
 
     private void Awake()
     {
+        Animator = GetComponent<Animator>();
         _currentState = PatrolState;
         _currentState.EnterState(this);
 
@@ -45,6 +48,22 @@ public class Enemy : MonoBehaviour
         if (_currentState != null)
         {
             _currentState.UpdateState(this);
+        }
+    }
+
+    public void Dead()
+    {
+        Destroy(gameObject);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (_currentState != RetreatState)
+        {
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                collision.gameObject.GetComponent<Player>().Dead();
+            }
         }
     }
 
